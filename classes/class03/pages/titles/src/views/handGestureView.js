@@ -1,10 +1,12 @@
 export default class HandGestureView {
   #handsCanvas = document.querySelector('#hands')
   #canvasContext = this.#handsCanvas.getContext('2d');
-  
-  constructor() {
+  #fingerLookupIndexes
+
+  constructor({ fingerLookupIndexes }) {
     this.#handsCanvas.width = globalThis.screen.availWidth
     this.#handsCanvas.height = globalThis.screen.availHeight
+    this.#fingerLookupIndexes = fingerLookupIndexes;
   }
 
   clearCanvas() {
@@ -21,6 +23,8 @@ export default class HandGestureView {
       this.#canvasContext.lineJoin = "round";
 
       this.#drawJoints(keypoints)
+
+      this.#drawFingersAndHoverElements(keypoints)
     }
   }
 
@@ -35,6 +39,16 @@ export default class HandGestureView {
 
       this.#canvasContext.arc(newX, newY, radius, startAngle, endAngle);
       this.#canvasContext.fill();
+    }
+  }
+
+  #drawFingersAndHoverElements(keypoints) {
+    const fingers = Object.keys(this.#fingerLookupIndexes);
+
+    for (const finger of fingers) {
+      const points = this.#fingerLookupIndexes[finger].map(
+        index => keypoints[index]
+      );
     }
   }
 
