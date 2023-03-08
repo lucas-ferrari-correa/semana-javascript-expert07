@@ -5,15 +5,13 @@ export default class HandGestureService {
   #handPoseDetection
   #handsVersion
   #detector = null
-  #knownGestures
   #gestureStrings
   
-  constructor({ fingerpose, handPoseDetection, handsVersion, knownGestures, gestureStrings }) {
+  constructor({ fingerpose, handPoseDetection, handsVersion, gestureStrings, knownGestures }) {
     this.#gestureEstimator = new fingerpose.GestureEstimator(knownGestures);
     this.#handPoseDetection = handPoseDetection;
     this.#handsVersion = handsVersion;
     this.#gestureStrings = gestureStrings;
-    this.#knownGestures = knownGestures;
   }
 
   async estimate(keypoints3D) {
@@ -38,6 +36,8 @@ export default class HandGestureService {
 
       const {x, y} = hand.keypoints.find(keypoint => keypoint.name === 'index_finger_tip');
       yield { event: result.name, x, y }
+
+      console.log('detected', this.#gestureStrings[result.name])
     }
   }
 
@@ -73,3 +73,4 @@ export default class HandGestureService {
     return this.#detector;
   }
 }
+

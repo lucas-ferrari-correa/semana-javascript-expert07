@@ -10,14 +10,14 @@ export default class HandGestureView {
   }
 
   clearCanvas() {
-    this.#canvasContext.clearRect(0, 0, this.#handsCanvas.width, this.#handsCanvas.height);
+    this.#canvasContext.clearRect(0, 0, this.#handsCanvas.width, this.#handsCanvas.height)
   }
   
   drawResults(hands) {
     for (const { keypoints, handedness } of hands) {
       if (!keypoints) continue;
 
-      this.#canvasContext.fillStyle = handedness === "Left" ? "red" : "green";
+      this.#canvasContext.fillStyle = handedness === "Left" ? "rgb(44, 212, 103)" : "rgb(44, 212, 103)";
       this.#canvasContext.strokeStyle = "white";
       this.#canvasContext.lineWidth = 8;
       this.#canvasContext.lineJoin = "round";
@@ -26,6 +26,22 @@ export default class HandGestureView {
 
       this.#drawFingersAndHoverElements(keypoints)
     }
+  }
+
+  clickOnElement(x, y) {
+    const element = document.elementFromPoint(x, y);
+    if (!element) return;
+
+    const rect = element.getBoundingClientRect();
+    const event = new MouseEvent('click', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+      clientX: rect.left + x,
+      clientY: rect.top + y
+    });
+
+    element.dispatchEvent(event);
   }
 
   #drawJoints(keypoints) {
@@ -49,6 +65,14 @@ export default class HandGestureView {
       const points = this.#fingerLookupIndexes[finger].map(
         index => keypoints[index]
       );
+
+      const region = new Path2D()
+      const [{ x, y }] = points;
+      region.moveTo(x, y);
+      for (const point of points) {
+        region.lineTo(point.x, point.y);
+      }
+      this.#canvasContext.stroke(region);
     }
   }
 
